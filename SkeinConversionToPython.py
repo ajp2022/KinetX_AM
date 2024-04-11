@@ -5,10 +5,10 @@ from mpl_toolkits.mplot3d import Axes3D
 # Initial Parameters
 step = 0.1 # resolution, time step period for each xyz calculation. smaller for smaller skeins
 k = 4
-dp = 0.08 # change to modify ER, minimum distance between fibers, center to center.
-h = 0.3 # height of each layer
-c1 = 2 # standard deviation coefficient
-H = 8 # total height of skein
+dp = 0.062 # change to modify ER, minimum distance between fibers, center to center.
+h = 0.2 # height of each layer
+c1 = 4 # standard deviation coefficient
+H = 7 # total height of skein
 
 p = dp / (np.pi)
 period = (H - h) / p
@@ -47,6 +47,7 @@ plt.show()
 # Calculating the effective radius (er)
 s = np.sum(np.sqrt(np.diff(x)**2 + np.diff(y)**2 + np.diff(z)**2))
 er = s / H
+print(s)
 
 # Save the data
 #np.savez('4nozzle.npz', x=x, y=y, z=z)

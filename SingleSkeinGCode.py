@@ -8,7 +8,7 @@ k = 4
 dp = 0.08  # change to modify ER, minimum distance between fibers, center to center
 h = 0.3  # height of each layer
 c1 = 2  # standard deviation coefficient
-H = 10  # total height of the skin
+H = 7  # total height of the skin
 
 
 p = dp / (np.pi)
