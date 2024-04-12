@@ -108,9 +108,9 @@ def skein(x_coord, y_coord, z_coord):
         skeingcode += f"G1  {x_str}  {y_str}  {z_str}  {f_str}\n"
     output_file.write(skeingcode)
 
-HeightLayers = 4 #True layer height is HeightLayers-1
-HorizontalIterations = 4
-VerticalIterations = 4
+HeightLayers = 15 #True layer height is HeightLayers-1
+HorizontalIterations = 1
+VerticalIterations = 1
 
 output_file.write(generated_beginning_gcode())
 
@@ -122,8 +122,8 @@ for z in range(1,HeightLayers):
                 operations += 1
                 x = (0.5+2*h)*offset
                 y = (0.5+2*v)*offset
-                z_new = (offset*z/3)
-                zexit = (offset*z/3) + 8 + 3
+                z_new = (offset*z/2)
+                zexit = (offset*z/2) + 8 + 3
                 X = f"{x:.13f}"
                 Y = f"{y:.13f}"
                 Z = f"{z_new: .13f}"
@@ -153,8 +153,8 @@ for z in range(1,HeightLayers):
                 operations += 1
                 x = (0.5+2*h)*offset+offset/4
                 y = (0.5+2*v)*offset+offset/4
-                z_new = (offset*z/3)
-                zexit = (offset*z/3) + 8 + 3
+                z_new = (offset*z/2)
+                zexit = (offset*z/2) + 8 + 3
                 X = f"{x:.13f}"
                 Y = f"{y:.13f}"
                 Z = f"{z_new: .13f}"
@@ -181,7 +181,7 @@ for z in range(1,HeightLayers):
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F300.0000000000000\n")
 
     
-    output_file.write(generated_end_gcode())
+output_file.write(generated_end_gcode())
 
 #2D Simulation Code
 for h in range(HorizontalIterations):
