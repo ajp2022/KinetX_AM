@@ -8,7 +8,7 @@ k = 4
 dp = 0.08  # change to modify ER, minimum distance between fibers, center to center
 h = 0.3  # height of each layer
 c1 = 2  # standard deviation coefficient
-H = 7  # total height of the skin
+H = 8  # total height of the skin
 
 
 p = dp / (np.pi)
@@ -18,7 +18,8 @@ n = (k - 1) / k
 t = np.arange(0, period + step, step)
 
 t1 = period * np.array([0, 1/5, 2/5, 3/5, 4/5, 1])
-r1 = H * np.array([0.25, 0.4, 0.55, 0.4, 0.36, 0.25])
+#r1 = H * np.array([0.25, 0.4, 0.55, 0.4, 0.36, 0.25])
+r1 = H * np.array([0.15, 0.2, 0.35, 0.35, 0.2, 0.15]) #ER: 92 BCC
 pol = np.polyfit(t1, r1, 3)
 
 a = np.polyval(pol, t)

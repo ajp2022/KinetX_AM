@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import CubicSpline
 
-output_file_path = "3D_4Nozzle_Test1.gcode"
+output_file_path = "4_Nozzle_HeightTest_2.gcode"
 output_file = open(output_file_path, "w")
 
 def generated_beginning_gcode():
@@ -48,13 +48,7 @@ plt.xlim(0, 50)
 plt.ylim(0, 50)
 offset = 10.617
 operations = 0
-
-def plot_dots_in_box(dot_coordinates):
-    for x, y in dot_coordinates:
-        plt.plot(x, y, 'bo', markersize = 10)
-def plot_dots_in_box_interweaved(dot_coordinates):
-    for x, y in dot_coordinates:
-        plt.plot(x, y, 'ro', markersize = 10)
+SKEIN_HEIGHT = 8
 
 def skein(x_coord, y_coord, z_coord):
     # Parameters for the path calculation
@@ -73,7 +67,8 @@ def skein(x_coord, y_coord, z_coord):
     t = np.arange(0, period + step, step)
 
     t1 = period * np.array([0, 1/5, 2/5, 3/5, 4/5, 1])
-    r1 = H * np.array([0.25, 0.4, 0.55, 0.4, 0.36, 0.25])
+    r1 = H * np.array([0.15, 0.2, 0.35, 0.35, 0.2, 0.15]) #ER: 92 BCC
+    #r1 = H * np.array([0.25, 0.4, 0.55, 0.4, 0.36, 0.25]) #ER: 132 Non-BCC
     pol = np.polyfit(t1, r1, 3)
 
     a = np.polyval(pol, t)
@@ -108,94 +103,85 @@ def skein(x_coord, y_coord, z_coord):
         skeingcode += f"G1  {x_str}  {y_str}  {z_str}  {f_str}\n"
     output_file.write(skeingcode)
 
-HeightLayers = 15 #True layer height is HeightLayers-1
+HeightLayers = 9 #True layer height is HeightLayers-1
 HorizontalIterations = 1
 VerticalIterations = 1
 
 output_file.write(generated_beginning_gcode())
-
+printheight = 0
 #Skein Code
-for z in range(1,HeightLayers):
+for z in range(HeightLayers):
     for h in range(HorizontalIterations):
-        if z % 2 != 0:
+        if z % 2 == 0:
             for v in range(VerticalIterations):
                 operations += 1
                 x = (0.5+2*h)*offset
                 y = (0.5+2*v)*offset
-                z_new = (offset*z/2)
-                zexit = (offset*z/2) + 8 + 3
+                raisedprintheight = printheight + SKEIN_HEIGHT + 3
                 X = f"{x:.13f}"
                 Y = f"{y:.13f}"
-                Z = f"{z_new: .13f}"
-                Zexit = f"{zexit: .13f}"
+                Z = f"{printheight: .13f}"
+                Zexit = f"{raisedprintheight: .13f}"
+                output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F120.0000000000000\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Z) + "  F120.0000000000000\n")
                 output_file.write("M106S255\n")
-                skein(x, y, z_new)
+                skein(x, y, printheight)
                 output_file.write("M107\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F300.0000000000000\n") # remember to put height in there, Adam parametrize this
             for v in range(VerticalIterations):
                 operations += 1
                 x = (1+2*h)*offset
                 y = (1+2*v)*offset
-                z_new = (offset*z/3)
-                zexit = (offset*z/3) + 8 + 3
+                raisedprintheight = printheight + SKEIN_HEIGHT + 3
                 X = f"{x:.13f}"
                 Y = f"{y:.13f}"
-                Z = f"{z_new: .13f}"
-                Zexit = f"{zexit: .13f}"
+                Z = f"{printheight: .13f}"
+                Zexit = f"{raisedprintheight: .13f}"
+                output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F120.0000000000000\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Z) + "  F120.0000000000000\n")
                 output_file.write("M106S255\n")
-                skein(x, y, z_new)
+                skein(x, y, printheight)
                 output_file.write("M107\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F300.0000000000000\n")
         else:
             for v in range(VerticalIterations):
                 operations += 1
-                x = (0.5+2*h)*offset+offset/4
-                y = (0.5+2*v)*offset+offset/4
-                z_new = (offset*z/2)
-                zexit = (offset*z/2) + 8 + 3
+                x = (0.5+2*h)*offset+offset/2
+                y = (0.5+2*v)*offset
+                raisedprintheight = printheight + SKEIN_HEIGHT + 3
                 X = f"{x:.13f}"
                 Y = f"{y:.13f}"
-                Z = f"{z_new: .13f}"
-                Zexit = f"{zexit: .13f}"
+                Z = f"{printheight: .13f}"
+                Zexit = f"{raisedprintheight: .13f}"
+                output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F120.0000000000000\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Z) + "  F120.0000000000000\n")
                 output_file.write("M106S255\n")
-                skein(x, y, z_new)
+                skein(x, y, printheight)
                 output_file.write("M107\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F300.0000000000000\n")
             for v in range(VerticalIterations):
                 operations += 1
-                x = (1+2*h)*offset+offset/4
-                y = (1+2*v)*offset+offset/4
-                z_new = (offset*z/3)
-                zexit = (offset*z/3) + 8 + 3
+                x = (1+2*h)*offset+offset/2
+                y = (1+2*v)*offset
+                raisedprintheight = printheight + SKEIN_HEIGHT + 3
                 X = f"{x:.13f}"
                 Y = f"{y:.13f}"
-                Z = f"{z_new: .13f}"
-                Zexit = f"{zexit: .13f}"
+                Z = f"{printheight: .13f}"
+                Zexit = f"{raisedprintheight: .13f}"
+                output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F120.0000000000000\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Z) + "  F120.0000000000000\n")
                 output_file.write("M106S255\n")
-                skein(x, y, z_new)
+                skein(x, y, printheight)
                 output_file.write("M107\n")
                 output_file.write("G1  X" + str(X) + "  Y" + str(Y) + "  Z" + str(Zexit) + "  F300.0000000000000\n")
-
+    printheight += SKEIN_HEIGHT/2 + 0.5
     
 output_file.write(generated_end_gcode())
 
-#2D Simulation Code
-for h in range(HorizontalIterations):
-    for v in range(VerticalIterations):
-        dot_coordinates = [(2*h*offset, offset+offset*2*v), (2*h*offset, offset*2*v), ((1+2*h)*offset, offset*2*v), ((1+2*h)*offset, offset+offset*2*v)]
-        plot_dots_in_box(dot_coordinates)
-    for v in range(VerticalIterations):
-        dot_coordinates = [((0.5+2*h)*offset, offset/2+offset+offset*2*v), ((0.5+2*h)*offset, offset/2+offset*2*v), ((1.5+2*h)*offset, offset/2+offset*2*v), ((1.5+2*h)*offset, offset/2+offset+offset*2*v)]
-        plot_dots_in_box_interweaved(dot_coordinates)
-
-#print("Number of Operations: " + str(operations))
-#print("Number of Skeins: " + str(operations*4))
+print("Number of Operations: " + str(operations))
+print("Number of Skeins: " + str(operations*4))
 #print("Estimated Print Time: " + str(operations * 3810 / 300) + " minutes")
 #print("Estimated Length: " + str(operations * 3.810) + " meters")
 #plt.show()
 
-output_file.close()
+#output_file.close()
